@@ -76,7 +76,7 @@ STATUS = {0x00: 'Command Success', 0x01: 'Checkmac Failure',
           0x11: 'Ready', 0xff: 'CRC / Communications Error'}
 
 class Decoder(srd.Decoder):
-    api_version = 2
+    api_version = 3
     id = 'atsha204a'
     name = 'ATSHA204A'
     longname = 'ATSHA204A TPM'
