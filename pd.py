@@ -132,7 +132,10 @@ class Decoder(srd.Decoder):
                 pass
             elif cmd == 'STOP':
                 self.es_block = es
-                self.opcode = -1 # Do this before that FIXME hacky hacky
+                # Reset the opcode before received data,
+                # as this causes responses to be displayed
+                # incorrectly
+                self.opcode = -1
                 self.output_rx_bytes()
                 self.waddr = -1
                 self.bytes = []
