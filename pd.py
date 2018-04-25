@@ -178,12 +178,12 @@ class Decoder(srd.Decoder):
         if (self.waddr == WORD_ADDR_RESET):
                 self.display_data([self.bytes[1]])
                 self.display_crc([self.bytes[2], self.bytes[3]])
-                self.display_status(self.bytes[1]) # FIXME Add entire package limits
+                self.display_status(self.bytes[0][0], self.bytes[-1][1], self.bytes[1][2])
         elif (self.waddr == WORD_ADDR_COMMAND):
                 if (count == 4): # Status /Error
                         self.display_data([self.bytes[1]])
                         self.display_crc([self.bytes[2], self.bytes[3]])
-                        self.display_status(self.bytes[1]) # FIXME Add entire package limits
+                        self.display_status(self.bytes[0][0], self.bytes[-1][1], self.bytes[1][2])
                 else:
                         self.display_data(self.bytes[1:-2])
                         self.display_crc([self.bytes[-2], self.bytes[-1]])
@@ -263,8 +263,8 @@ class Decoder(srd.Decoder):
     def display_crc(self, data):
         self.put(data[0][0], data[1][1], self.out_ann, [6, ['CRC: {:02X} {:02X}'.format(data[0][2], data[1][2])]])
 
-    def display_status(self, data):
-        self.put(data[0], data[1], self.out_ann, [7, ['Status: %s'% STATUS[data[2]]]])
+    def display_status(self, start, end, status):
+        self.put(start, end, self.out_ann, [7, ['Status: %s'% STATUS[status]]])
 
     def display_warning(self, start, end, msg):
         self.put(start, end, self.out_ann, [8, ['Warning: %s' % msg]])
