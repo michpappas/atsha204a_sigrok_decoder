@@ -150,9 +150,8 @@ class Decoder(srd.Decoder):
                 pass
 
     def output_tx_bytes(self):
-#        if len(self.bytes) < 4: # FIXME only ignore cases with 0 bytes. 1 byte is a valid message (eg RESET)
-#                print("Ignoring {} bytes".format(len(self.bytes)))
-#                return
+        if len(self.bytes) < 1: # Ignore wakeup
+                return
         self.waddr = self.bytes[0][2]
         self.display_waddr(self.bytes[0])
         if self.waddr == WORD_ADDR_COMMAND:
