@@ -159,8 +159,9 @@ class Decoder(srd.Decoder):
                 self.display_count(self.bytes[1])
 
                 if (len(self.bytes) - 1 != count):
-                        # TODO display warning
-                        print("Invalid frame length: Got {}, expecting {} ".format(len(self.bytes) - 1, count))
+                        self.display_warning(self.bytes[0][0], self.bytes[-1][1],
+                            "Invalid frame length: Got {}, expecting {} ".format(
+                              len(self.bytes) - 1, count))
                         return
 
                 self.opcode = self.bytes[2][2]
@@ -265,3 +266,5 @@ class Decoder(srd.Decoder):
     def display_status(self, data):
         self.put(data[0], data[1], self.out_ann, [7, ['Status: %s'% STATUS[data[2]]]])
 
+    def display_warning(self, start, end, msg):
+        self.put(start, end, self.out_ann, [8, ['Warning: %s' % msg]])
