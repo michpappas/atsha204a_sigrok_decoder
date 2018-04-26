@@ -81,7 +81,7 @@ class Decoder(srd.Decoder):
     name = 'ATSHA204A'
     longname = 'ATSHA204A TPM'
     desc = 'atsha204a description'
-    license = 'gplv3+'
+    license = 'gplv2+'
     inputs = ['i2c']
     outputs = ['atsha204a']
     annotations = (
