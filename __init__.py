@@ -19,7 +19,7 @@
 
 '''
 This decoder stacks on top of the 'i2c' PD and decodes the
-ATSHA204A Microchip CryptoAuthentication packets.
+Microchip ATSHA204A CryptoAuthentication protocol.
 '''
 
 from .pd import Decoder
