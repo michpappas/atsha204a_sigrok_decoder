@@ -37,6 +37,7 @@ OPCODE_LOCK             = 0x17
 OPCODE_MAC              = 0x08
 OPCODE_NONCE            = 0x16
 OPCODE_PAUSE            = 0x01
+OPCODE_PRIVWRITE        = 0x46
 OPCODE_RANDOM           = 0x1b
 OPCODE_READ             = 0x02
 OPCODE_SHA              = 0x47
@@ -59,6 +60,7 @@ OPCODES = {
     0x28: 'CheckMac',
     0x30: 'DevRev',
     0x40: 'GenKey',
+    0x46: 'PrivWrite',
     0x47: 'SHA',
 }
 
@@ -186,6 +188,8 @@ class Decoder(srd.Decoder):
             self.putx(s, [3, ['Mode: %02X' % s[2]]])
         elif op == OPCODE_DERIVE_KEY:
             self.putx(s, [3, ['Random: %s' % s[2]]])
+        elif op == OPCODE_PRIVWRITE:
+            self.putx(s, [3, ['Encrypted: {}'.format('Yes' if s[2] & 0x40 else 'No')]])
         elif op == OPCODE_GEN_DIG:
             self.putx(s, [3, ['Zone: %s' % ZONES[s[2]]]])
         elif op == OPCODE_LOCK:
@@ -207,7 +211,7 @@ class Decoder(srd.Decoder):
         op = self.opcode
         if op == OPCODE_DERIVE_KEY:
             self.puty(s, [4, ['TargetKey: {:02x} {:02x}'.format(s[1][2], s[0][2])]])
-        elif op in (OPCODE_COUNTER, OPCODE_GEN_KEY):
+        elif op in (OPCODE_COUNTER, OPCODE_GEN_KEY, OPCODE_PRIVWRITE):
             self.puty(s, [4, ['KeyID: {:02x} {:02x}'.format(s[1][2], s[0][2])]])
         elif op in (OPCODE_NONCE, OPCODE_PAUSE, OPCODE_RANDOM):
             self.puty(s, [4, ['Zero: {:02x} {:02x}'.format(s[1][2], s[0][2])]])
@@ -236,6 +240,12 @@ class Decoder(srd.Decoder):
             self.putz(s[0][0], s[3][1], [5, ['OtherData: %s' % ' '.join(format(i[2], '02x') for i in s)]])
         elif op == OPCODE_MAC:
             self.putz(s[0][0], s[31][1], [5, ['Challenge: %s' % ' '.join(format(i[2], '02x') for i in s)]])
+        elif op == OPCODE_PRIVWRITE:
+            if len(s) > 36: # Key + MAC.
+                self.putz(s[0][0], s[-35][1], [5, ['Value: %s' % ' '.join(format(i[2], '02x') for i in s)]])
+                self.putz(s[-32][0], s[-1][1], [5, ['MAC: %s' % ' '.join(format(i[2], '02x') for i in s)]])
+            else: # Just value.
+                self.putz(s[0][0], s[-1][1], [5, ['Value: %s' % ' '.join(format(i[2], '02x') for i in s)]])
         elif op == OPCODE_WRITE:
             if len(s) > 32: # Value + MAC.
                 self.putz(s[0][0], s[-31][1], [5, ['Value: %s' % ' '.join(format(i[2], '02x') for i in s)]])
