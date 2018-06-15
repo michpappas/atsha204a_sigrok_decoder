@@ -30,6 +30,7 @@ OPCODE_COUNTER          = 0x24
 OPCODE_DERIVE_KEY       = 0x1c
 OPCODE_DEV_REV          = 0x30
 OPCODE_GEN_DIG          = 0x15
+OPCODE_GEN_KEY          = 0x40
 OPCODE_HMAC             = 0x11
 OPCODE_CHECK_MAC        = 0x28
 OPCODE_LOCK             = 0x17
@@ -57,6 +58,7 @@ OPCODES = {
     0x24: 'Counter',
     0x28: 'CheckMac',
     0x30: 'DevRev',
+    0x40: 'GenKey',
     0x47: 'SHA',
 }
 
@@ -178,8 +180,9 @@ class Decoder(srd.Decoder):
 
     def put_param1(self, s):
         op = self.opcode
-        if op in (OPCODE_CHECK_MAC, OPCODE_COUNTER, OPCODE_DEV_REV, OPCODE_HMAC, \
-                OPCODE_MAC, OPCODE_NONCE, OPCODE_RANDOM, OPCODE_SHA):
+        if op in (OPCODE_CHECK_MAC, OPCODE_COUNTER, OPCODE_DEV_REV, \
+                  OPCODE_GEN_KEY, OPCODE_HMAC, OPCODE_MAC, OPCODE_NONCE, \
+                  OPCODE_RANDOM, OPCODE_SHA):
             self.putx(s, [3, ['Mode: %02X' % s[2]]])
         elif op == OPCODE_DERIVE_KEY:
             self.putx(s, [3, ['Random: %s' % s[2]]])
@@ -204,7 +207,7 @@ class Decoder(srd.Decoder):
         op = self.opcode
         if op == OPCODE_DERIVE_KEY:
             self.puty(s, [4, ['TargetKey: {:02x} {:02x}'.format(s[1][2], s[0][2])]])
-        elif op == OPCODE_COUNTER:
+        elif op in (OPCODE_COUNTER, OPCODE_GEN_KEY):
             self.puty(s, [4, ['KeyID: {:02x} {:02x}'.format(s[1][2], s[0][2])]])
         elif op in (OPCODE_NONCE, OPCODE_PAUSE, OPCODE_RANDOM):
             self.puty(s, [4, ['Zero: {:02x} {:02x}'.format(s[1][2], s[0][2])]])
@@ -229,7 +232,7 @@ class Decoder(srd.Decoder):
             self.putz(s[64][0], s[76][1], [5, ['OtherData: %s' % ' '.join(format(i[2], '02x') for i in s[64:76])]])
         elif op == OPCODE_DERIVE_KEY:
             self.putz(s[0][0], s[31][1], [5, ['MAC: %s' % ' '.join(format(i[2], '02x') for i in s)]])
-        elif op == OPCODE_GEN_DIG:
+        elif op in (OPCODE_GEN_DIG, OPCODE_GEN_KEY):
             self.putz(s[0][0], s[3][1], [5, ['OtherData: %s' % ' '.join(format(i[2], '02x') for i in s)]])
         elif op == OPCODE_MAC:
             self.putz(s[0][0], s[31][1], [5, ['Challenge: %s' % ' '.join(format(i[2], '02x') for i in s)]])
