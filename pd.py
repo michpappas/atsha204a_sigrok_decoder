@@ -41,6 +41,7 @@ OPCODE_PRIVWRITE        = 0x46
 OPCODE_RANDOM           = 0x1b
 OPCODE_READ             = 0x02
 OPCODE_SHA              = 0x47
+OPCODE_SIGN             = 0x41
 OPCODE_UPDATE_EXTRA     = 0x20
 OPCODE_WRITE            = 0x12
 
@@ -60,6 +61,7 @@ OPCODES = {
     0x28: 'CheckMac',
     0x30: 'DevRev',
     0x40: 'GenKey',
+    0x41: 'Sign',
     0x46: 'PrivWrite',
     0x47: 'SHA',
 }
@@ -184,7 +186,7 @@ class Decoder(srd.Decoder):
         op = self.opcode
         if op in (OPCODE_CHECK_MAC, OPCODE_COUNTER, OPCODE_DEV_REV, \
                   OPCODE_GEN_KEY, OPCODE_HMAC, OPCODE_MAC, OPCODE_NONCE, \
-                  OPCODE_RANDOM, OPCODE_SHA):
+                  OPCODE_RANDOM, OPCODE_SHA, OPCODE_SIGN):
             self.putx(s, [3, ['Mode: %02X' % s[2]]])
         elif op == OPCODE_DERIVE_KEY:
             self.putx(s, [3, ['Random: %s' % s[2]]])
@@ -211,7 +213,7 @@ class Decoder(srd.Decoder):
         op = self.opcode
         if op == OPCODE_DERIVE_KEY:
             self.puty(s, [4, ['TargetKey: {:02x} {:02x}'.format(s[1][2], s[0][2])]])
-        elif op in (OPCODE_COUNTER, OPCODE_GEN_KEY, OPCODE_PRIVWRITE):
+        elif op in (OPCODE_COUNTER, OPCODE_GEN_KEY, OPCODE_PRIVWRITE, OPCODE_SIGN):
             self.puty(s, [4, ['KeyID: {:02x} {:02x}'.format(s[1][2], s[0][2])]])
         elif op in (OPCODE_NONCE, OPCODE_PAUSE, OPCODE_RANDOM):
             self.puty(s, [4, ['Zero: {:02x} {:02x}'.format(s[1][2], s[0][2])]])
