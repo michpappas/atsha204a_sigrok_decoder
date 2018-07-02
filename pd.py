@@ -236,9 +236,9 @@ class Decoder(srd.Decoder):
             return
         op = self.opcode
         if op == OPCODE_CHECK_MAC:
-            self.putz(s[0][0], s[31][1], [5, ['ClientChal: %s' % ' '.join(format(i[2], '02x') for i in s[0:31])]])
-            self.putz(s[32][0], s[63][1], [5, ['ClientResp: %s' % ' '.join(format(i[2], '02x') for i in s[32:63])]])
-            self.putz(s[64][0], s[76][1], [5, ['OtherData: %s' % ' '.join(format(i[2], '02x') for i in s[64:76])]])
+            self.putz(s[0][0], s[31][1], [5, ['ClientChal: %s' % ' '.join(format(i[2], '02x') for i in s[0:32])]])
+            self.putz(s[32][0], s[63][1], [5, ['ClientResp: %s' % ' '.join(format(i[2], '02x') for i in s[32:64])]])
+            self.putz(s[64][0], s[76][1], [5, ['OtherData: %s' % ' '.join(format(i[2], '02x') for i in s[64:77])]])
         elif op == OPCODE_DERIVE_KEY:
             self.putz(s[0][0], s[31][1], [5, ['MAC: %s' % ' '.join(format(i[2], '02x') for i in s)]])
         elif op in (OPCODE_GEN_DIG, OPCODE_GEN_KEY):
