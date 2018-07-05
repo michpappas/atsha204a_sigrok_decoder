@@ -29,6 +29,7 @@ WORD_ADDR = {0x00: 'RESET', 0x01: 'SLEEP', 0x02: 'IDLE', 0x03: 'COMMAND'}
 OPCODE_COUNTER          = 0x24
 OPCODE_DERIVE_KEY       = 0x1c
 OPCODE_DEV_REV          = 0x30
+OPCODE_ECDH             = 0x43
 OPCODE_GEN_DIG          = 0x15
 OPCODE_GEN_KEY          = 0x40
 OPCODE_HMAC             = 0x11
@@ -63,6 +64,7 @@ OPCODES = {
     0x30: 'DevRev',
     0x40: 'GenKey',
     0x41: 'Sign',
+    0x43: 'ECDH',
     0x45: 'Verify',
     0x46: 'PrivWrite',
     0x47: 'SHA',
@@ -186,9 +188,10 @@ class Decoder(srd.Decoder):
 
     def put_param1(self, s):
         op = self.opcode
-        if op in (OPCODE_CHECK_MAC, OPCODE_COUNTER, OPCODE_DEV_REV, \
-                  OPCODE_GEN_KEY, OPCODE_HMAC, OPCODE_MAC, OPCODE_NONCE, \
-                  OPCODE_RANDOM, OPCODE_SHA, OPCODE_SIGN, OPCODE_VERIFY):
+        if op in (OPCODE_CHECK_MAC, OPCODE_COUNTER, OPCODE_DEV_REV,     \
+                  OPCODE_ECDH, OPCODE_GEN_KEY, OPCODE_HMAC, OPCODE_MAC, \
+                  OPCODE_NONCE, OPCODE_RANDOM, OPCODE_SHA, OPCODE_SIGN, \
+                  OPCODE_VERIFY):
             self.putx(s, [3, ['Mode: %02X' % s[2]]])
         elif op == OPCODE_DERIVE_KEY:
             self.putx(s, [3, ['Random: %s' % s[2]]])
@@ -215,8 +218,8 @@ class Decoder(srd.Decoder):
         op = self.opcode
         if op == OPCODE_DERIVE_KEY:
             self.puty(s, [4, ['TargetKey: {:02x} {:02x}'.format(s[1][2], s[0][2])]])
-        elif op in (OPCODE_COUNTER, OPCODE_GEN_KEY, OPCODE_PRIVWRITE, OPCODE_SIGN, \
-                    OPCODE_VERIFY):
+        elif op in (OPCODE_COUNTER, OPCODE_ECDH, OPCODE_GEN_KEY, OPCODE_PRIVWRITE, \
+                    OPCODE_SIGN, OPCODE_VERIFY):
             self.puty(s, [4, ['KeyID: {:02x} {:02x}'.format(s[1][2], s[0][2])]])
         elif op in (OPCODE_NONCE, OPCODE_PAUSE, OPCODE_RANDOM):
             self.puty(s, [4, ['Zero: {:02x} {:02x}'.format(s[1][2], s[0][2])]])
@@ -241,6 +244,9 @@ class Decoder(srd.Decoder):
             self.putz(s[64][0], s[76][1], [5, ['OtherData: %s' % ' '.join(format(i[2], '02x') for i in s[64:77])]])
         elif op == OPCODE_DERIVE_KEY:
             self.putz(s[0][0], s[31][1], [5, ['MAC: %s' % ' '.join(format(i[2], '02x') for i in s)]])
+        elif op == OPCODE_ECDH:
+                self.putz(s[0][0], s[31][1], [5, ['Pub X: %s' % ' '.join(format(i[2], '02x') for i in s[0:32])]])
+                self.putz(s[32][0], s[63][1], [5, ['Pub Y: %s' % ' '.join(format(i[2], '02x') for i in s[32:64])]])
         elif op in (OPCODE_GEN_DIG, OPCODE_GEN_KEY):
             self.putz(s[0][0], s[3][1], [5, ['OtherData: %s' % ' '.join(format(i[2], '02x') for i in s)]])
         elif op == OPCODE_MAC:
