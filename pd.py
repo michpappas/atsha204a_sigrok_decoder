@@ -94,13 +94,13 @@ STATUS = {
 
 class Decoder(srd.Decoder):
     api_version = 3
-    id = 'atsha204a'
-    name = 'ATSHA204A'
-    longname = 'Microchip ATSHA204A'
-    desc = 'Microchip ATSHA204A CryptoAuthentication device'
+    id = 'atcryptoauth'
+    name = 'ATCryptoAuth'
+    longname = 'Microchip CryptoAuth'
+    desc = 'Microchip CryptoAuthentication device'
     license = 'gplv2+'
     inputs = ['i2c']
-    outputs = ['atsha204a']
+    outputs = ['ATCryptoAuth']
     annotations = (
         ('waddr', 'Word address'),
         ('count', 'Count'),

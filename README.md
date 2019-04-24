@@ -1,10 +1,11 @@
-# ATSHA204A decoder for sigrok
+# Sigrok decoder for Microchip's CryptoAuthenctication modules
 
-Sigrok decoder for the ATSHA204A Microchip CryptoAuthentication module.
+Sigrok decoder for Microchip's CryptoAuthentication modules. Supported
+devices are ATSHA204, ATSHA204A, ATECC508A, ATECC108 and ATECC108A.
 
 This decoder stacks on top of the I2C PD and decodes the packets of the
-ATSHA204A.
+CryptoAuthentication module.
 
 For more information on sigrok visit: https://sigrok.org/
 
-![Pulseview screenshot ATSHA204A decoder](screenshot.png)
+![Pulseview screenshot ATCryptoAuth decoder](screenshot.png)
